@@ -33,9 +33,11 @@ jobs:
           rm -f data/raw/*.csv
           python scripts/fetch_datagovsg.py
 
-      - name: Fetch URA API series (vacancy, supply) -- only if key is set
+      - name: Fetch URA API series (transactions, pipeline, rental) -- only if key is set
         if: env.URA_ACCESS_KEY != ''
-        run: python scripts/fetch_ura_api.py
+        run: |
+          python scripts/fetch_ura_api.py
+          python scripts/flatten_transactions.py
 
       - name: Rebuild master dataset and signals
         run: |
@@ -48,11 +50,20 @@ jobs:
         run: |
           mkdir -p docs
           python - <<'EOF'
-          import csv, json
+          import csv, json, shutil
+          from pathlib import Path
+
           with open("data/processed/master_quarterly_signals.csv", encoding="utf-8") as f:
               rows = list(csv.DictReader(f))
           with open("docs/master_quarterly_signals.json", "w", encoding="utf-8") as f:
               json.dump(rows, f)
+
+          # Property-level data (only present once URA_ACCESS_KEY is set)
+          for name in ["transactions_flat", "pipeline_ura_api", "rental_median_ura_api"]:
+              for src in [Path(f"data/processed/{name}.json"), Path(f"data/raw/{name}.json")]:
+                  if src.exists():
+                      shutil.copy(src, f"docs/{name}.json")
+                      break
           EOF
 
       - name: Commit and push if anything changed

@@ -1,3 +1,9 @@
 __pycache__/
 *.pyc
 .env
+
+# Large intermediate artifacts, regenerated fresh every CI run -- not worth
+# the git history bloat (raw transaction dump ~31MB, full flatten ~46MB).
+# Only the filtered, product-relevant transactions_flat.json is committed.
+data/raw/transaction_ura_api.json
+data/processed/transactions_flat_full.json
