@@ -7,7 +7,15 @@ Historical calibration dataset for Singapore private residential property,
 
 Public repo: https://github.com/dolphene/property-prowl. A scheduled GitHub Actions workflow (`.github/workflows/refresh-data.yml`) runs the full pipeline twice a week (Mon & Thu 22:00 UTC) and publishes the result to GitHub Pages at **https://dolphene.github.io/property-prowl/master_quarterly_signals.json** — that's the live public data URL, consumed by `property-prowl-site`'s own workflow. Trigger manually with `gh workflow run refresh-data.yml -R dolphene/property-prowl`.
 
-To add the URA AccessKey once it arrives: `gh secret set URA_ACCESS_KEY -R dolphene/property-prowl`, then fill in the real dataset endpoints in `scripts/fetch_ura_api.py` (see its docstring — the auth flow is implemented, the exact vacancy/pipeline-supply endpoint paths weren't verifiable without a real key).
+**Update 2026-09-18: URA key added and tested.** `URA_ACCESS_KEY` is set as a GitHub secret. Three real endpoints confirmed working against the live key:
+
+- `PMI_Resi_Transaction` (batched, 4 pages) — **caveat-level transactions**: project, street, price, floor range, area, contract date, sale type, property type, district, tenure, market segment. This is the property-level data the original spec's "Bucket B" needed for comparables — previously thought unavailable for free.
+- `PMI_Resi_Pipeline` — pipeline supply by project (units by type, district, expected TOP year, development status).
+- `PMI_Resi_Rental_Median` — per-project median rental PSF by quarter, with 25th/75th percentile.
+
+Raw output saved to `data/raw/{transaction,pipeline,rental_median}_ura_api.json` (transaction file is ~31MB — every project's transaction records). **Not yet processed into the master quarterly table or the site's signals/comparables** — that's a real design task (how to aggregate pipeline data into a "Supply Pressure" signal, how to build the property comparables engine from raw transactions) still pending user direction, not silently built.
+
+**Vacancy was NOT found** despite testing every plausible service name (`PMI_Resi_Vacancy`, `PMI_Resi_Stock`, `PMI_Resi_Occupancy`, `PMI_Resi_Completion`, and more — all return `"Invalid service."`). Either it's under a name not yet guessed, or it isn't exposed via this API at all. See `scripts/fetch_ura_api.py`'s docstring for how to find the real name if you can see URA's own API reference while logged in.
 
 ## Pipeline
 
