@@ -1,0 +1,57 @@
+name: Refresh URA data
+
+on:
+  schedule:
+    # Twice a week -- matches URA's fastest-updating series (transactions).
+    - cron: "0 22 * * 1,4"   # Mon & Thu 22:00 UTC (~06:00 SGT Tue/Fri)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch free data.gov.sg series
+        run: python scripts/fetch_datagovsg.py
+
+      - name: Fetch URA API series (vacancy, supply) -- only if key is set
+        if: env.URA_ACCESS_KEY != ''
+        env:
+          URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
+        run: python scripts/fetch_ura_api.py
+
+      - name: Rebuild master dataset and signals
+        run: |
+          python scripts/build_master_dataset.py
+          python scripts/signal_thresholds.py
+          python scripts/regime_backtest.py
+          python scripts/export_dashboard_data.py
+
+      - name: Publish plain JSON for external consumers (e.g. Lovable)
+        run: |
+          mkdir -p docs
+          python - <<'EOF'
+          import csv, json
+          with open("data/processed/master_quarterly_signals.csv", encoding="utf-8") as f:
+              rows = list(csv.DictReader(f))
+          with open("docs/master_quarterly_signals.json", "w", encoding="utf-8") as f:
+              json.dump(rows, f)
+          EOF
+
+      - name: Commit and push if anything changed
+        run: |
+          git config user.name "prowl-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: refresh URA data $(date -u +%Y-%m-%d)"
+          git push
