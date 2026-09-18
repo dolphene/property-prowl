@@ -22,10 +22,15 @@ jobs:
           python-version: "3.12"
 
       - name: Fetch free data.gov.sg series
-        run: python scripts/fetch_datagovsg.py
+        run: |
+          # fetch_datagovsg.py skips a dataset if its raw CSV already exists
+          # (handy for local dev to avoid re-hitting the rate limit) -- but
+          # in CI we always want the latest, so clear the cache first.
+          rm -f data/raw/*.csv
+          python scripts/fetch_datagovsg.py
 
       - name: Fetch URA API series (vacancy, supply) -- only if key is set
-        if: env.URA_ACCESS_KEY != ''
+        if: ${{ secrets.URA_ACCESS_KEY != '' }}
         env:
           URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
         run: python scripts/fetch_ura_api.py
