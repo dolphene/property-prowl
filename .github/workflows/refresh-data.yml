@@ -38,6 +38,7 @@ jobs:
         run: |
           python scripts/fetch_ura_api.py
           python scripts/flatten_transactions.py
+          python scripts/analyze_interesting_projects.py
 
       - name: Rebuild master dataset and signals
         run: |
