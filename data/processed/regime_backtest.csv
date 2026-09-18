@@ -1,0 +1,11 @@
+period,label,n_quarters,price_all_qoq_pct,price_all_yoy_pct,rent_nonlanded_qoq_pct,rent_nonlanded_yoy_pct,price_rent_divergence_yoy_pts,rent_price_ratio_index,txn_total_qoq_pct,txn_total_yoy_pct,dev_sales_new_total
+2006-Q1 to 2007-Q4,Pre-GFC boom,8,5.2,23.38,7.27,35.4,-10.49,82.53,9.51,80.88,3064.0
+2008-Q1 to 2009-Q1,GFC correction (peak to trough),5,-3.71,6.51,-1.51,14.18,-7.85,93.14,16.07,-48.7,1311.6
+2009-Q2 to 2010-Q4,V-shaped recovery,7,4.99,9.94,1.44,-2.08,10.29,82.95,23.78,113.97,3957.71
+2011-Q1 to 2013-Q2,Continued boom (pre-TDSR),10,1.02,5.53,0.67,4.69,-0.3,80.62,-1.34,-4.17,4716.8
+2013-Q3 to 2017-Q2,Cooling-measures adjustment,16,-0.75,-2.47,-0.75,-2.63,0.67,79.28,4.1,-1.73,1984.12
+2017-Q3 to 2019-Q4,Recovery,10,1.19,4.11,0.14,0.39,3.76,72.6,-1.26,0.49,2178.6
+2020-Q1 to 2020-Q2,COVID shock,2,-0.32,1.77,0.1,0.91,0.3,71.77,-25.04,-15.03,1884.0
+2020-Q3 to 2022-Q4,Post-COVID surge,10,2.15,7.53,3.59,10.18,-3.19,72.18,12.23,27.4,2575.9
+2023-Q1 to 2025-Q4,Higher-rate moderation,12,1.16,5.38,0.63,6.67,-1.11,80.66,7.51,11.19,1944.5
+2026-Q1 to 2026-Q2,Current,2,0.69,3.16,0.37,1.98,0.26,76.98,-2.81,-2.78,2056.0
