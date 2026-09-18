@@ -32,6 +32,7 @@ jobs:
           # in CI we always want the latest, so clear the cache first.
           rm -f data/raw/*.csv
           python scripts/fetch_datagovsg.py
+          python scripts/fetch_sora.py
 
       - name: Fetch URA API series (transactions, pipeline, rental) -- only if key is set
         if: env.URA_ACCESS_KEY != ''
@@ -39,6 +40,7 @@ jobs:
           python scripts/fetch_ura_api.py
           python scripts/flatten_transactions.py
           python scripts/analyze_interesting_projects.py
+          python scripts/analyze_supply_pipeline.py
 
       - name: Rebuild master dataset and signals
         run: |
