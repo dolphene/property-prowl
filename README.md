@@ -3,6 +3,12 @@
 Historical calibration dataset for Singapore private residential property,
 2006–2026, built before any dashboard/UI work (Lovable spec comes last).
 
+## Live, automated (as of 2026-09-18)
+
+Public repo: https://github.com/dolphene/property-prowl. A scheduled GitHub Actions workflow (`.github/workflows/refresh-data.yml`) runs the full pipeline twice a week (Mon & Thu 22:00 UTC) and publishes the result to GitHub Pages at **https://dolphene.github.io/property-prowl/master_quarterly_signals.json** — that's the live public data URL, consumed by `property-prowl-site`'s own workflow. Trigger manually with `gh workflow run refresh-data.yml -R dolphene/property-prowl`.
+
+To add the URA AccessKey once it arrives: `gh secret set URA_ACCESS_KEY -R dolphene/property-prowl`, then fill in the real dataset endpoints in `scripts/fetch_ura_api.py` (see its docstring — the auth flow is implemented, the exact vacancy/pipeline-supply endpoint paths weren't verifiable without a real key).
+
 ## Pipeline
 
 1. `scripts/fetch_datagovsg.py` — pulls raw series from data.gov.sg's
