@@ -9,6 +9,11 @@ match criterion; since that field doesn't exist, size similarity (with
 tolerance bands, per the brief's own ±10/15/20% guidance) is used as the
 practical substitute. This is a real data limitation, not an oversight --
 documented here and in the comparables engine itself.
+
+IMPORTANT: URA reports transaction area in SQUARE METERS, not square feet
+(easy to miss -- a raw psf using the unconverted figure comes out ~10.76x
+too high, e.g. $17,568 psf for an RCR freehold apartment, which is not a
+real number). Converted to sqft here before computing psf.
 """
 import json
 from pathlib import Path
@@ -18,6 +23,7 @@ OUT_PATH = Path(__file__).resolve().parent.parent / "data" / "processed" / "tran
 OUT_PATH_FULL = Path(__file__).resolve().parent.parent / "data" / "processed" / "transactions_flat_full.json"
 
 SALE_TYPE = {"1": "New Sale", "2": "Sub Sale", "3": "Resale"}
+SQM_TO_SQFT = 10.7639
 
 # The full flattened dataset is ~46MB / 130k+ rows -- too large to ship to a
 # browser for a client-side static-site prototype (this is exactly the kind
@@ -53,12 +59,13 @@ def main() -> None:
         }
         for t in p.get("transaction", []):
             try:
-                area = float(t.get("area") or 0)
+                area_sqm = float(t.get("area") or 0)  # URA reports area in SQUARE METERS
                 price = float(t.get("price") or 0)
             except ValueError:
                 continue
-            if area <= 0 or price <= 0:
+            if area_sqm <= 0 or price <= 0:
                 continue
+            area_sqft = area_sqm * SQM_TO_SQFT
             rows.append({
                 **base,
                 "district": t.get("district"),
@@ -66,9 +73,9 @@ def main() -> None:
                 "typeOfArea": t.get("typeOfArea"),
                 "tenure": t.get("tenure"),
                 "floorRange": t.get("floorRange"),
-                "area_sqft": round(area, 1),
+                "area_sqft": round(area_sqft, 1),
                 "price": price,
-                "psf": round(price / area, 2),
+                "psf": round(price / area_sqft, 2),
                 "contractDate": parse_contract_date(t.get("contractDate", "")),
                 "saleType": SALE_TYPE.get(t.get("typeOfSale"), t.get("typeOfSale")),
                 "noOfUnits": t.get("noOfUnits"),
