@@ -14,6 +14,10 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    env:
+      # secrets cannot be referenced directly in `if:` conditions -- hence
+      # the job-level env var, checked via env.URA_ACCESS_KEY below instead.
+      URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,9 +34,7 @@ jobs:
           python scripts/fetch_datagovsg.py
 
       - name: Fetch URA API series (vacancy, supply) -- only if key is set
-        if: ${{ secrets.URA_ACCESS_KEY != '' }}
-        env:
-          URA_ACCESS_KEY: ${{ secrets.URA_ACCESS_KEY }}
+        if: env.URA_ACCESS_KEY != ''
         run: python scripts/fetch_ura_api.py
 
       - name: Rebuild master dataset and signals
