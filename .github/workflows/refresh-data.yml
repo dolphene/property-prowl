@@ -34,6 +34,9 @@ jobs:
           python scripts/fetch_datagovsg.py
           python scripts/fetch_sora.py
 
+      - name: Fetch real Vacancy rate from URA's own quarterly press release
+        run: python scripts/fetch_ura_vacancy.py
+
       - name: Fetch URA API series (transactions, pipeline, rental) -- only if key is set
         if: env.URA_ACCESS_KEY != ''
         run: |
