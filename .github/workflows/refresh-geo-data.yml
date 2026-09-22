@@ -32,6 +32,17 @@ jobs:
       - name: Fetch and geocode school locations from MOE
         run: python scripts/fetch_schools.py
 
+      - name: Geocode supply-pipeline projects for the Map page
+        run: |
+          # Reads data/raw/pipeline_ura_api.json as committed by
+          # refresh-data.yml's own twice-weekly run -- no need to hit
+          # URA's own API again here, this workflow just adds locations.
+          if [ -f data/raw/pipeline_ura_api.json ]; then
+            python scripts/fetch_supply_locations.py
+          else
+            echo "No pipeline_ura_api.json yet -- skipping until refresh-data.yml has run with URA_ACCESS_KEY set."
+          fi
+
       - name: Commit and push if anything changed
         run: |
           git config user.name "prowl-bot"
