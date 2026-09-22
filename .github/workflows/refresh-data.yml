@@ -44,6 +44,7 @@ jobs:
           python scripts/flatten_transactions.py
           python scripts/analyze_interesting_projects.py
           python scripts/analyze_supply_pipeline.py
+          python scripts/analyze_resale_matches.py
 
       - name: Rebuild master dataset and signals
         run: |

@@ -128,6 +128,12 @@ def clean_name(raw: str) -> str:
     return re.sub(r"\s+(MRT|LRT)\s+STATION$", "", raw.strip(), flags=re.IGNORECASE).title()
 
 
+# LTA's shapefile also includes depots and other rail facilities tagged
+# the same way as passenger stations -- not places anyone measures
+# "distance to MRT" from, so exclude anything matching these.
+NON_STATION_PATTERN = re.compile(r"depot|siding|facility building|tunnel structure", re.IGNORECASE)
+
+
 def main() -> None:
     url = find_shapefile_url()
     req = urllib.request.Request(url, headers=HEADERS)
@@ -147,7 +153,7 @@ def main() -> None:
         for sr in sf.shapeRecords():
             rec = sr.record.as_dict()
             raw_name = rec.get("STN_NAM_DE") or rec.get("STN_NAM") or ""
-            if not raw_name or not sr.shape.points:
+            if not raw_name or not sr.shape.points or NON_STATION_PATTERN.search(raw_name):
                 continue
             name = clean_name(raw_name)
             typ = (rec.get("TYP_CD_DES") or "MRT").upper()
