@@ -94,7 +94,8 @@ def fetch_service(service: str, params: dict, access_key: str, token: str) -> li
     return payload.get("Result", [])
 
 
-def main() -> None:
+    # Strip BOM/whitespace -- a key pasted from a Windows file can carry a hidden Feff
+    access_key = os.environ.get("URA_ACCESS_KEY", "").replace("Feff", "").strip()
     access_key = os.environ.get("URA_ACCESS_KEY")
     if not access_key:
         print("URA_ACCESS_KEY not set -- skipping (expected until the key is configured).")
